@@ -70,37 +70,104 @@ library(evd)
 
 thetas1 <- c()
 thetas2 <- c()
-qs <- c(4:35)
-for(q in qs){
-  thetas1 <- c(thetas1,exi(rain,u=q,r=1))
-  thetas2 <- c(thetas2,exi(rain,u=q,r=2))
+thetas3 <- c()
+us <- c(4:35)
+for(u in us){
+  thetas1 <- c(thetas1,exi(rain,u=u,r=1))
+  thetas2 <- c(thetas2,exi(rain,u=u,r=2))
+  thetas3 <- c(thetas3,exi(rain,u=u,r=0))
 }
 
-
 par(mfrow=c(1,1),mar=c(4.1,6.1,0.5,2.1))
-plot(qs,thetas1,type="l",ylim=c(0.3,1.05),
+plot(us,thetas1,type="l",ylim=c(0.3,1.05),
      xlab="u",ylab="theta",cex.main=2,
-     cex.lab=2,cex.axis=1.5)
-lines(qs,thetas2,col="blue")
+     cex.lab=2,cex.axis=1.5,lwd=2)
+lines(us,thetas2,col="blue",lwd=2)
+lines(us,thetas3,col="red",lwd=2)
 legend(25,0.6,legend=c("m=1","m=2"),col=c("black","blue"),
        lty=c(1,1),lwd = c(2,2))
+abline(h=1,lty="dotted")
+
+# Function to obtain moving block bootstrap from data set X
+blockbootstrap <- function(X,blocksize){
+  n <- length(X)
+  boot.samp <- rep(NA,n)
+  ind <- c(1:n)
+  
+  for(i in 1:(n/blocksize)){
+    ind.strt <- sample(ind,1,replace=T)
+    block.ind <- c(ind.strt:(ind.strt+blocksize-1)) %% n
+    if(length(which(block.ind==0))>0){
+      block.ind[which(block.ind==0)] <- n
+    }
+    ind.new.samp <- c(((i-1)*blocksize+1): (i*blocksize))
+    boot.samp[ind.new.samp] <- X[block.ind]
+  }
+  boot.samp
+}
+
+theta.bootstrap <- function(X,n.samp,us,block.size){
+  CIs <- matrix(NA,ncol=6,nrow=length(us))
+  colnames(CIs) <- c("lower_r1","upper_r1","lower_r2","upper_r2","lower_fs","upper_fs")
+  for(i in seq_along(us)){
+    print(paste("Bootsrap for u =",us[i]))
+    thetas <- matrix(NA,ncol=3,nrow=n.samp)
+    for(j in 1:n.samp){
+      X.boot <- blockbootstrap(X,block.size)
+      thetas[j,1] <- exi(X.boot,u=us[i],r=1)
+      thetas[j,2] <- exi(X.boot,u=us[i],r=2)
+      thetas[j,3] <- exi(X.boot,u=us[i],r=0)
+    }
+    CIs[i,c(1,2)] <- quantile(thetas[,1],c(0.025,0.975))
+    CIs[i,c(3,4)] <- quantile(thetas[,2],c(0.025,0.975))
+    CIs[i,c(5,6)] <- quantile(thetas[,3],c(0.025,0.975))
+  }
+  CIs
+}
+
+# ACF of rain data to select block size
+acf(rain)
+
+# Pick 47 since length(rain)/47 is integer
+length(rain)/47
+
+CIs <- theta.bootstrap(rain,n.samp,us,47)
+
+par(mfrow=c(1,2),mar=c(4.1,6.1,2,0.2))
+plot(us,thetas1,type="l",ylim=c(0.3,1.05),
+     xlab="u",ylab="theta",main="WWWW",
+     cex.main=2,cex.lab=2,cex.axis=1.5,lwd=2)
+polygon(x=c(us,rev(us)),y=c(CIs[,1],rev(CIs[,2])),
+        col="lightgrey",border="lightgrey")
+polygon(x=c(us,rev(us)),y=c(CIs[,3],rev(CIs[,4])),
+        col="lightgrey",border="lightgrey")
+lines(us,thetas1,lwd=2)
+lines(us,thetas2,lwd=2)
+abline(h=1,lty="dotted")
+
+
+plot(us,thetas3,type="l",ylim=c(0.3,1.05),
+     xlab="u",ylab="theta",main="YYYYYYYYYYYYY",
+     cex.main=2,cex.lab=2,cex.axis=1.5,lwd=2)
+polygon(x=c(us,rev(us)),y=c(CIs[,5],rev(CIs[,6])),col="lightgrey",border="lightgrey")
+lines(us,thetas3,lwd=2)
 abline(h=1,lty="dotted")
 
 # ---------------------------- Slide 41 -----------------------------
 
 # Set current wd to KAUST_Course
 # setwd(".../KAUST_Course/")
-myd <- read.table("Data/SP500_daily.csv", header=TRUE, sep=",")
+SP500 <- read.table("Data/SP500_daily.csv", header=TRUE, sep=",")
 
 par(mfrow=c(1,1),mgp=c(3,0.8,0),mar=c(5,5,0.5,0.5))
-plot(as.Date(myd$Date),myd$Close,ylab="YYYYY",xlab="XXXXX",
+plot(as.Date(SP500$Date),SP500$Close,ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l")
 
 rets <- c()
-for(i in 1:(length(myd$Close)-1)){
-  rets <- c(rets,(myd$Close[i]-myd$Close[i+1])/myd$Close[i])
+for(i in 1:(length(SP500$Close)-1)){
+  rets <- c(rets,(SP500$Close[i]-SP500$Close[i+1])/SP500$Close[i])
 }
-plot(as.Date(myd$Date)[1:(length(myd$Date)-1)],rets,ylab="YYYYY",xlab="XXXXX",
+plot(as.Date(SP500$Date)[1:(length(SP500$Date)-1)],rets,ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l")
 
 # ---------------------------- Slide 42 -----------------------------
@@ -108,7 +175,7 @@ plot(as.Date(myd$Date)[1:(length(myd$Date)-1)],rets,ylab="YYYYY",xlab="XXXXX",
 # Get the squared returns
 rets.2 <- rets^2
 
-plot(as.Date(myd$Date)[1:(length(myd$Date)-1)],rets.2,ylab="YYYYY",xlab="XXXXX",
+plot(as.Date(SP500$Date)[1:(length(SP500$Date)-1)],rets.2,ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l")
 
 # ---------------------------- Slide 43 -----------------------------
@@ -148,7 +215,7 @@ for(i in (1+h/2):(length(rets)-h/2)){
 res <- (rets[(h/2+1):(length(rets)-h/2)]-means)/sds
 
 # Plot the squared standardised returns 
-subseq.dts <- as.Date(myd$Date)[(1+h/2):(length(myd$Date)-(1+h/2))]
+subseq.dts <- as.Date(SP500$Date)[(1+h/2):(length(SP500$Date)-(1+h/2))]
 plot(subseq.dts,res^2,ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l")
 
@@ -157,18 +224,23 @@ plot(subseq.dts,res^2,ylab="YYYYY",xlab="XXXXX",
 # Compute extremal indexes for m=1,2 and various u's (us)
 thetas.res1 <- c()
 thetas.res2 <- c()
+thetas.res3 <- c()
 us <- seq(0,6,by=0.01)
 for(u in us){
   thetas.res1 <- c(thetas.res1,exi(res^2,u=u,r=1))
   thetas.res2 <- c(thetas.res2,exi(res^2,u=u,r=2))
+  thetas.res3 <- c(thetas.res3,exi(res^2,u=u,r=0))
 }
 
 # Plot extremal indexes computed for m=1,2 and various u's (us)
+par(mfrow=c(1,2),mar=c(4.1,6.1,2,0.2))
 plot(us,thetas.res1,ylim=c(0,1),ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l",lwd=2)
 lines(us,thetas.res2,col="blue",lwd=2)
+lines(us,thetas.res3,col="red",lwd=2)
 legend(4,0.4,legend=c("m=1","m=2"),col=c("black","blue"),
        lty=c(1,1),lwd = c(3,3))
+
 
 # ---------------------------- Slide 47 -----------------------------
 
@@ -199,7 +271,7 @@ for(i in 1:length(cs)){
 # Get index of values exceeding u (i.e. those in clusters)
 ind.c <- which(rets.2>u)
 
-dts <- as.Date(myd$Date)[1:(length(myd$Date)-1)]
+dts <- as.Date(SP500$Date)[1:(length(SP500$Date)-1)]
 plot(dts,rets.2,ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l")
 points(dts[ind.c],rets.2[ind.c],col="blue",pch=20)
@@ -237,4 +309,3 @@ qs <- qgpd(ps,u,fit$mle[1],fit$mle[2])
 plot(qs,sort(maxima),ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,cex.main=2,main="WWWWW")
 abline(a=0,b=1)
-
