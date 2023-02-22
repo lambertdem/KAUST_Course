@@ -1,7 +1,7 @@
 rm(list=ls())
 set.seed(444)
 # ---------------------------- Slide 16 -----------------------------
-
+library(evd)
 # Sample 100 iid standard Frechet RVs
 par(mfrow=c(1,1),mar=c(4.1,6.1,0.5,2.1))
 
@@ -90,7 +90,7 @@ abline(h=1,lty="dotted")
 
 # Set current wd to KAUST_Course
 # setwd(".../KAUST_Course/")
-myd <- read.table("Data/SP500-10d.csv", header=TRUE, sep=",")
+myd <- read.table("Data/SP500_daily.csv", header=TRUE, sep=",")
 
 par(mfrow=c(1,1),mgp=c(3,0.8,0),mar=c(5,5,0.5,0.5))
 plot(as.Date(myd$Date),myd$Close,ylab="YYYYY",xlab="XXXXX",
