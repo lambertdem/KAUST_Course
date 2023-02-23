@@ -155,6 +155,7 @@ abline(h=1,lty="dotted")
 
 # Set current wd to KAUST_Course
 # setwd(".../KAUST_Course/")
+setwd("C:/Users/lambe/Documents/Edinburgh/PhD/KAUST/KAUST_Course/")
 SP500 <- read.table("Data/SP500_daily.csv", header=TRUE, sep=",")
 
 par(mfrow=c(1,1),mgp=c(3,0.8,0),mar=c(5,5,0.5,0.5))
@@ -222,20 +223,17 @@ plot(subseq.dts,res^2,ylab="YYYYY",xlab="XXXXX",
 # Compute extremal indexes for m=1,2 and various u's (us)
 thetas.res1 <- c()
 thetas.res2 <- c()
-thetas.res3 <- c()
 us <- seq(0,6,by=0.01)
 for(u in us){
   thetas.res1 <- c(thetas.res1,exi(res^2,u=u,r=1))
   thetas.res2 <- c(thetas.res2,exi(res^2,u=u,r=2))
-  thetas.res3 <- c(thetas.res3,exi(res^2,u=u,r=0))
 }
 
 # Plot extremal indexes computed for m=1,2 and various u's (us)
-par(mfrow=c(1,2),mar=c(4.1,6.1,2,0.2))
+par(mfrow=c(1,1),mar=c(4.1,6.1,2,0.2))
 plot(us,thetas.res1,ylim=c(0,1),ylab="YYYYY",xlab="XXXXX",
      cex.lab=2,cex.axis=1.5,type="l",lwd=2)
 lines(us,thetas.res2,col="blue",lwd=2)
-lines(us,thetas.res3,col="red",lwd=2)
 legend(4,0.4,legend=c("m=1","m=2"),col=c("black","blue"),
        lty=c(1,1),lwd = c(3,3))
 
@@ -250,7 +248,7 @@ length(cs)
 # Store the maxima from each cluster
 maxima <- c()
 
-# Store index of cluster maxima within all squred returns
+# Store index of cluster maxima within all squared returns
 ind.max <- c()
 
 for(i in 1:length(cs)){
@@ -258,7 +256,7 @@ for(i in 1:length(cs)){
   maxima <- c(maxima,max(cs[[i]]))
   
   # Get index of all values in cluster i
-  ind.clust.i <- as.numeric(names(cs[[34]]))
+  ind.clust.i <- as.numeric(names(cs[[i]]))
   
   # Select index corresponding to maxima within cluster i
   ind <- ind.clust.i[which.max(cs[[i]])]
