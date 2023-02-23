@@ -93,13 +93,11 @@ blockbootstrap <- function(X,blocksize){
   n <- length(X)
   boot.samp <- rep(NA,n)
   ind <- c(1:n)
-  
+  ind.strt <- sample(ind,n/blocksize,replace=T)
   for(i in 1:(n/blocksize)){
-    ind.strt <- sample(ind,1,replace=T)
-    block.ind <- c(ind.strt:(ind.strt+blocksize-1)) %% n
-    if(length(which(block.ind==0))>0){
-      block.ind[which(block.ind==0)] <- n
-    }
+    block.ind <- c(ind.strt[i]:(ind.strt[i]+blocksize-1)) %% n
+    block.ind[block.ind==0] <- n
+    
     ind.new.samp <- c(((i-1)*blocksize+1): (i*blocksize))
     boot.samp[ind.new.samp] <- X[block.ind]
   }
