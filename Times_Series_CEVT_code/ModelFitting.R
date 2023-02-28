@@ -33,15 +33,16 @@ back <- BackTransform(x.lap = orleans_data_lap$data$TX,
                       x.orig = orleans_data$TX)
 plot(back,orleans_data$TX)
 
-# Thresholds of exceedances above which to fit the models
-thresh.lap <- quantile(orleans_data_lap$data$TX, probs=seq(0.85,0.95, length=11))
-
 # -------------------------------------------------------------------
 # Model fitting
 # -------------------------------------------------------------------
 
 # Number of lags ahead to fit
 L <- 20
+
+# Thresholds of exceedances above which to fit the models
+thresh.lap <- quantile(orleans_data_lap$data$TX, probs=seq(0.85,0.95, length=11))
+
 
 # fit order 1 model at a range of threshold (for stability plots)
 markov1_origdata_all_thresholds <- lapply(thresh.lap, function(i) fit.Markov.wrapper(pars=c(1,0), 
