@@ -4,7 +4,8 @@
 # orders 1, 2 & 3. 
 #===============================================================================
 rm(list=ls())
-setwd("C:/Users/lambe/Documents/Edinburgh/PhD/CodeSharing_IP_LDM/Time_Series_Conditional_Extremes_code/") 
+setwd(".../KAUST_Course/Times_Series_CEVT_code/") 
+
 library(tidyverse)
 source("MarkovFitsGaussZ.R")
 source("ForwardSimulationFunctions.R")
