@@ -4,7 +4,7 @@
 # orders 1, 2 & 3. 
 #===============================================================================
 rm(list=ls())
-setwd(".../KAUST_Course/Times_Series_CEVT_code/") 
+setwd("C:/Users/lambe/Documents/Edinburgh/PhD/KAUST/KAUST_Course/Times_Series_CEVT_code/") 
 
 library(tidyverse)
 source("MarkovFitsGaussZ.R")
@@ -42,7 +42,6 @@ L <- 20
 
 # Thresholds of exceedances above which to fit the models
 thresh.lap <- quantile(orleans_data_lap$data$TX, probs=seq(0.85,0.95, length=11))
-
 
 # fit order 1 model at a range of threshold (for stability plots)
 markov1_origdata_all_thresholds <- lapply(thresh.lap, function(i) fit.Markov.wrapper(pars=c(1,0), 
@@ -99,8 +98,7 @@ z.list <- get.z(filt.data, lengthsList, alphas, beta, L)
 n.sim <- 1000
 
 # Select a threshold above which to simulate X.0 with standard exp.
-quantile(orleans_data$TX,0.96)
-X.0 <- quantile(orleans_data_lap$data$TX,0.96)
+X.0 <- quantile(orleans_data_lap$data$TX,0.95)
 
 # Run the forward simulation based on X.0, fitted alphas and beta, residuals
 clusters <- forwardSim(X.0, alphas, beta, z.list, n.sim)
