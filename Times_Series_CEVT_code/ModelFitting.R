@@ -4,7 +4,7 @@
 # orders 1, 2 & 3. 
 #===============================================================================
 rm(list=ls())
-setwd("C:/Users/lambe/Documents/Edinburgh/PhD/KAUST/KAUST_Course/Times_Series_CEVT_code/") 
+setwd(".../KAUST_Course/Times_Series_CEVT_code/") 
 
 library(tidyverse)
 source("MarkovFitsGaussZ.R")
